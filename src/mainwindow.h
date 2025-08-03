@@ -48,16 +48,17 @@ class MainWindow: public QMainWindow{
   QHBoxLayout *RightLayout;
   QVBoxLayout *LeftLayout; 
   QVBoxLayout *MainContentLayout;
+
   //right side
   QVBoxLayout* MainLayoutHolder;
   QScrollArea* RigthScrollArea;
   QWidget* widgetholder;
-  QLineEdit *SearchBar;
  
   //top 
   QPushButton *editContent;
   QPushButton *loadFileBtn;
   QPushButton *addNewPasswordElement;
+  QLineEdit *SearchBar;
 
   QScrollArea* LeftScrollArea;
   QWidget* LeftWidgetHolder;

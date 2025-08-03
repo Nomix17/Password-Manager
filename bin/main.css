@@ -6,9 +6,7 @@ QWidget {
 QLabel,
 QLineEdit{
   padding:5px;
-  font-size:17px;
-}
-
+  font-size:17px; }
 #leftSideLabelsInPasswordElement{
   padding:5px;
   min-width:100px;
@@ -22,7 +20,7 @@ QLineEdit{
 }
 
 #somethingMissingLabel{
-  color:red;
+  color:#101010;
   font-size:12px;
 }
 
