@@ -6,7 +6,9 @@ QWidget {
 QLabel,
 QLineEdit{
   padding:5px;
-  font-size:17px; }
+  font-size:17px; 
+}
+
 #leftSideLabelsInPasswordElement{
   padding:5px;
   min-width:100px;

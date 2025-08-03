@@ -365,28 +365,36 @@ void MainWindow::createFileContentElements(DataFile* File){
   RigthScrollArea = new QScrollArea;
   QWidget* widgetholder = new QWidget;
   MainLayoutHolder = new QVBoxLayout;
-  widgetholder->setLayout(MainLayoutHolder);
-  widgetholder->setObjectName("CentralWidgetHolder");
+  MainLayoutHolder->setAlignment(Qt::AlignTop);
 
   RigthScrollArea->setWidget(widgetholder);
   RigthScrollArea->setWidgetResizable(true);
   RigthScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  widgetholder->setLayout(MainLayoutHolder);
   MainContentLayout->addWidget(RigthScrollArea);
+  widgetholder->setObjectName("CentralWidgetHolder");
 
-  for(PasswordItem Item : File->FileContent){
+  for(PasswordItem Item:File->FileContent){
     QWidget* holderwidget = new QWidget;
-    QGridLayout* layoutholder = new QGridLayout;
+    QHBoxLayout* layoutholder = new QHBoxLayout;
+    QVBoxLayout* ElementLayout = new QVBoxLayout;
+    QVBoxLayout* FarRightLayout = new QVBoxLayout;
 
-    QLabel* PasswordType = new QLabel(Item.ServiceName);
-    PasswordType->setObjectName("leftSideLabelsInPasswordElement");
+    QHBoxLayout* TopLayout = new QHBoxLayout;
+    QHBoxLayout* RightLayout = new QHBoxLayout;
 
-    QLineEdit* UserName = new QLineEdit(Item.userName);
+    QLabel* serviceNameLabel = new QLabel;
+    serviceNameLabel->setText(Item.ServiceName);
+    serviceNameLabel->setObjectName("leftSideLabelsInPasswordElement");
+    QLineEdit* UserName = new QLineEdit;
+    UserName->setText(Item.userName);
     UserName->setReadOnly(true);
 
-    QLabel* passwordLabel = new QLabel("Password");
+    QLabel* passwordLabel = new QLabel;
     passwordLabel->setObjectName("leftSideLabelsInPasswordElement");
-
-    QLineEdit* Password = new QLineEdit(Item.password);
+    passwordLabel->setText("Password");
+    QLineEdit* Password = new QLineEdit;
+    Password->setText(Item.password);
     Password->setReadOnly(true);   
 
     QPushButton* deleteButton = new QPushButton;
@@ -402,30 +410,34 @@ void MainWindow::createFileContentElements(DataFile* File){
     NewRandomPassword->setObjectName("NewRandomPassword");
     NewRandomPassword->setIcon(QPixmap("icons/random.png")); 
     NewRandomPassword->setIconSize(QSize(20,20));
-    connect(NewRandomPassword, &QPushButton::clicked, [this,Item](){
+    connect(NewRandomPassword,&QPushButton::clicked,[this,Item](){
         RandomizePassword(Item);
     });
+    TopLayout->addWidget(serviceNameLabel);
+    TopLayout->addWidget(UserName);
+    
+    RightLayout->addWidget(passwordLabel);
+    RightLayout->addWidget(Password);
 
-    layoutholder->addWidget(PasswordType, 0, 0);
-    layoutholder->addWidget(UserName,0, 1);
-    layoutholder->addWidget(deleteButton,0, 2);
+    ElementLayout->addLayout(TopLayout);
+    ElementLayout->addLayout(RightLayout);
 
+    FarRightLayout->addWidget(deleteButton);
+    FarRightLayout->addWidget(NewRandomPassword);
 
-    layoutholder->addWidget(passwordLabel, 1, 0);
-    layoutholder->addWidget(Password,1, 1);
-    layoutholder->addWidget(NewRandomPassword, 1, 2);
+    layoutholder->addLayout(ElementLayout);
+    layoutholder->addLayout(FarRightLayout);
 
     holderwidget->setLayout(layoutholder);
+
     MainLayoutHolder->addWidget(holderwidget);
 
-    editLineVector.push_back({PasswordType, UserName, Password});
+    editLineVector.push_back({serviceNameLabel,UserName,Password});
     lineEditElementsHolders.push_back(holderwidget);
   }
-
   currentlyLoadedFile = File;
+
 }
-
-
 void MainWindow::DeleteItem(const PasswordItem Item){
   for(size_t i=0;i<currentlyLoadedFile->FileContent.size();i++){
     if(Item.ServiceName == currentlyLoadedFile->FileContent[i].ServiceName && Item.userName == currentlyLoadedFile->FileContent[i].userName && Item.password == currentlyLoadedFile->FileContent[i].password){
