@@ -6,5 +6,7 @@ SOURCES += main.cpp \
            mainwindow.cpp
 
 HEADERS += mainwindow.h \
-           passwordInputWindow.h
+           passwordInputWindow.h \
+           NewElementWindow.h \
+           passwordGeneration.h
 

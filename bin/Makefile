@@ -54,11 +54,13 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../src/main.cpp \
 		../src/mainwindow.cpp moc_mainwindow.cpp \
-		moc_passwordInputWindow.cpp
+		moc_passwordInputWindow.cpp \
+		moc_NewElementWindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		moc_mainwindow.o \
-		moc_passwordInputWindow.o
+		moc_passwordInputWindow.o \
+		moc_NewElementWindow.o
 DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/common/unix.conf \
 		/usr/lib/qt6/mkspecs/common/linux.conf \
@@ -434,7 +436,9 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/features/yacc.prf \
 		/usr/lib/qt6/mkspecs/features/lex.prf \
 		../src/PasswordManager.pro ../src/mainwindow.h \
-		../src/passwordInputWindow.h ../src/main.cpp \
+		../src/passwordInputWindow.h \
+		../src/NewElementWindow.h \
+		../src/passwordGeneration.h ../src/main.cpp \
 		../src/mainwindow.cpp
 QMAKE_TARGET  = PasswordManager
 DESTDIR       = 
@@ -1219,7 +1223,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../src/mainwindow.h ../src/passwordInputWindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../src/mainwindow.h ../src/passwordInputWindow.h ../src/NewElementWindow.h ../src/passwordGeneration.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../src/main.cpp ../src/mainwindow.cpp $(DISTDIR)/
 
 
@@ -1252,9 +1256,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++2a -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_passwordInputWindow.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_passwordInputWindow.cpp moc_NewElementWindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_passwordInputWindow.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_passwordInputWindow.cpp moc_NewElementWindow.cpp
 moc_mainwindow.cpp: ../src/mainwindow.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
@@ -1264,6 +1268,12 @@ moc_passwordInputWindow.cpp: ../src/passwordInputWindow.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
 	/usr/lib/qt6/moc $(DEFINES) --include /home/pain/Code/qt/PasswordManager/bin/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/pain/Code/qt/PasswordManager/src -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../src/passwordInputWindow.h -o moc_passwordInputWindow.cpp
+
+moc_NewElementWindow.cpp: ../src/NewElementWindow.h \
+		../src/passwordGeneration.h \
+		moc_predefs.h \
+		/usr/lib/qt6/moc
+	/usr/lib/qt6/moc $(DEFINES) --include /home/pain/Code/qt/PasswordManager/bin/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/pain/Code/qt/PasswordManager/src -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../src/NewElementWindow.h -o moc_NewElementWindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1285,7 +1295,9 @@ main.o: ../src/main.cpp ../src/mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../src/main.cpp
 
 mainwindow.o: ../src/mainwindow.cpp ../src/mainwindow.h \
-		../src/passwordInputWindow.h
+		../src/passwordInputWindow.h \
+		../src/NewElementWindow.h \
+		../src/passwordGeneration.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../src/mainwindow.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
@@ -1293,6 +1305,9 @@ moc_mainwindow.o: moc_mainwindow.cpp
 
 moc_passwordInputWindow.o: moc_passwordInputWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_passwordInputWindow.o moc_passwordInputWindow.cpp
+
+moc_NewElementWindow.o: moc_NewElementWindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NewElementWindow.o moc_NewElementWindow.cpp
 
 ####### Install
 

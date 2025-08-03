@@ -10,12 +10,15 @@ class InputWindow:public QDialog{
   public:
   QString Password = "";
 
-  InputWindow(QDialog* parent = nullptr):QDialog(parent){
+  InputWindow(QDialog* parent ,QString responce=" "):QDialog(parent){
+    this->setFixedSize(800,400);
     QVBoxLayout *MainLayout = new QVBoxLayout;
     QLabel* passwordLabel = new QLabel;
     passwordLabel->setObjectName("passwordLabel");
     passwordLabel->setText("Please Enter Your Password:");
     QLineEdit *PasswordInput = new QLineEdit;
+    QLabel *WrongPassLabel = new QLabel(responce);
+    WrongPassLabel->setObjectName("somethingMissingLabel");
     QPushButton *OkButton = new QPushButton("OK");
     OkButton->setObjectName("okButton");
     connect(OkButton, &QPushButton::clicked,[this,PasswordInput](){
@@ -24,6 +27,7 @@ class InputWindow:public QDialog{
     });
     MainLayout->addWidget(passwordLabel);
     MainLayout->addWidget(PasswordInput);
+    MainLayout->addWidget(WrongPassLabel);
     MainLayout->addStretch();
     MainLayout->addWidget(OkButton,0,Qt::AlignHCenter);
     setLayout(MainLayout);

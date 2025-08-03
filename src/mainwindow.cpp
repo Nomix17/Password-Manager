@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "passwordInputWindow.h"
+#include "NewElementWindow.h"
+#include "passwordGeneration.h"
 #include <iostream>
 #include <fstream>
 #include <QHBoxLayout>
@@ -51,28 +53,42 @@ MainWindow::MainWindow(QWidget *parentWidget):QMainWindow(parentWidget){
   RightLayout->setAlignment(Qt::AlignLeft);
   LeftLayoutHolder->setAlignment(Qt::AlignTop);
 
-  setCentralWidget(MainCentralWidget);
   loadFileBtn = new QPushButton;
   loadFileBtn->setObjectName("loadFileBtn");
+  
+  addNewPasswordElement = new QPushButton;
+  addNewPasswordElement->setObjectName("addNewPasswordElement");
+
   editContent = new QPushButton;
   editContent->setObjectName("editContent");
+  
   loadFileBtn->setIcon(QPixmap("icons/loadFileIcon.png"));
   editContent->setIcon(QPixmap("icons/editIcon.png"));
+  addNewPasswordElement->setIcon(QPixmap("icons/add.png"));
+
   loadFileBtn->setIconSize(QSize(24,24));
   editContent->setIconSize(QSize(24,24));
+  addNewPasswordElement->setIconSize(QSize(24,24));
+
   connect(loadFileBtn,&QPushButton::clicked,this,&MainWindow::getFile);
   connect(editContent,&QPushButton::clicked,this,&MainWindow::EnableEditContent);
-  
+  connect(addNewPasswordElement,&QPushButton::clicked,this,&MainWindow::NewPasswordElement);
+
   SearchBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   loadFileBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
   editContent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
   TopLayout->addWidget(loadFileBtn);
   TopLayout->addWidget(SearchBar);
+  TopLayout->addWidget(addNewPasswordElement);
   TopLayout->addWidget(editContent);
+
   loadPasswordFile();
   for(DataFile* File:loadedFiles)
     createFileButton(File);
+
+  setCentralWidget(MainCentralWidget);
+
 }
 
 void MainWindow::getFile(){
@@ -91,8 +107,10 @@ void MainWindow::getFile(){
 void MainWindow::EnableEditContent(){
   if(currentlyLoadedFile == nullptr) return;
   for(size_t i=0;i<editLineVector.size();i++){
-    editLineVector[i][0]->setReadOnly(false);
-    editLineVector[i][1]->setReadOnly(false);
+    QLineEdit* UserNameElement = qobject_cast<QLineEdit*>(editLineVector[i][1]);
+    QLineEdit* PassElement = qobject_cast<QLineEdit*>(editLineVector[i][2]);
+    UserNameElement->setReadOnly(false);
+    PassElement->setReadOnly(false);
   }
   editContent->setIcon(QPixmap("icons/save.png"));
   QPushButton* cancelButton = new QPushButton;
@@ -106,24 +124,34 @@ void MainWindow::EnableEditContent(){
 }
 
 void MainWindow::SaveEditedContent(){
-  for(size_t i=0;i<editLineVector.size();i++){
-    editLineVector[i][0]->setReadOnly(true);
-    editLineVector[i][1]->setReadOnly(true);
-  }
   std::stringstream sstr;
   for(size_t i=0;i<editLineVector.size();i++){
-    std::string NewUserName = editLineVector[i][0]->text().toStdString();
-    std::string NewPassword = editLineVector[i][1]->text().toStdString();
-    std::string Type = currentlyLoadedFile->FileContent[i].type.toStdString();
+    QLabel* ServiceNameElement = qobject_cast<QLabel*>(editLineVector[i][0]);
+    QLineEdit* UserNameElement = qobject_cast<QLineEdit*>(editLineVector[i][1]);
+    QLineEdit* PassElement = qobject_cast<QLineEdit*>(editLineVector[i][2]);
+
+    UserNameElement->setReadOnly(true);
+    PassElement->setReadOnly(true);
+
+    std::string Type = ServiceNameElement->text().toStdString();
+    std::string NewUserName = UserNameElement->text().toStdString();
+    std::string NewPassword = PassElement->text().toStdString();
     sstr<<Type<<":"<<NewUserName<<"\nPassword:"<<NewPassword<<"\n";
   }
   QString qFormatedString = QString::fromStdString(sstr.str());
 
   int status = -1;
+  int counter = 0;
   while(status == -1){
-    QString Password = GetPasswordInput();
+    QString Password;
+    if(counter == 0){
+      Password = GetPasswordInput();
+    }else{
+      Password = GetPasswordInput("Wrong Password");
+    }
     if(Password.isEmpty()) return;
     status = EncryptingViaPython(currentlyLoadedFile->path, Password, sstr.str());
+    counter++;
   }
 
   std::vector <PasswordItem> FileContent = fetchContent(qFormatedString);
@@ -150,6 +178,20 @@ void MainWindow::CancelContentEdit(){
   delete cancelButton;
 }
 
+void MainWindow::NewPasswordElement(){
+  if(currentlyLoadedFile == nullptr) return;
+  NewElementWindow win;
+  win.exec();
+  if((win.ServiceName.isEmpty() && win.UserName.isEmpty() && win.Password.isEmpty())) return;
+  PasswordItem newPasswordItem;
+  newPasswordItem.ServiceName = win.ServiceName;
+  newPasswordItem.userName = win.UserName;
+  newPasswordItem.password = win.Password;
+  
+  currentlyLoadedFile->FileContent.push_back(newPasswordItem);
+  createFileContentElements(currentlyLoadedFile);
+}
+
 void MainWindow::createFileButton(DataFile* File){
   QPushButton *newFileButton = new QPushButton;
   newFileButton->setText(File->fileName);
@@ -168,16 +210,17 @@ void MainWindow::loadFile(DataFile* File){
   }
 
   QString inputedPassword = GetPasswordInput();
-    if(!inputedPassword.isEmpty()){
-      QString DecryptionResults = DecryptingViaPython(File->path, inputedPassword);
-      if(DecryptionResults == "Failed" || DecryptionResults == "Base64 Decode Failed" || DecryptionResults == "Decryption Failed"){
-        std::cerr<<DecryptionResults.toStdString()<<"\n";
-        return;
-      }
-      std::vector <PasswordItem> FileContent = fetchContent(DecryptionResults);
-      File->FileContent = FileContent;
-      createFileContentElements(File); 
+  if(!inputedPassword.isEmpty()){
+    QString DecryptionResults = DecryptingViaPython(File->path, inputedPassword);
+    while(DecryptionResults == "Failed" || DecryptionResults == "Base64 Decode Failed" || DecryptionResults == "Decryption Failed"){
+      inputedPassword = GetPasswordInput("Wrong Password");
+      DecryptionResults = DecryptingViaPython(File->path, inputedPassword);
+      if(inputedPassword.isEmpty()) return;
     }
+    std::vector <PasswordItem> FileContent = fetchContent(DecryptionResults);
+    File->FileContent = FileContent;
+    createFileContentElements(File); 
+  }
 }
 
 void MainWindow::savePasswordFile(DataFile* File){
@@ -198,8 +241,8 @@ void MainWindow::loadPasswordFile(){
   }
 }
 
-QString MainWindow::GetPasswordInput(){
-  InputWindow inWin;
+QString MainWindow::GetPasswordInput(QString responce){
+  InputWindow inWin(nullptr,responce);
   inWin.exec();
   QString inputedPassword = inWin.Password;
   return inputedPassword ;
@@ -290,7 +333,7 @@ std::vector <PasswordItem> MainWindow::fetchContent(QString FileOutput){
   while(getline(ss, line, splitChar)){
     if(line.find(":") != std::string::npos){
       if(line.find("Password") == std::string::npos && line.find("password") == std::string::npos){
-        std::string type = line.substr(0,line.find(":")); 
+        std::string ServiceName = line.substr(0,line.find(":")); 
         std::string OriginalUserName = line.substr(line.find(":")+1);
         std::string UserName; 
         size_t start;
@@ -298,7 +341,7 @@ std::vector <PasswordItem> MainWindow::fetchContent(QString FileOutput){
         UserName = OriginalUserName.substr(start);
 
         PasswordItem newPasswordItem;
-        newPasswordItem.type = QString::fromStdString(type);
+        newPasswordItem.ServiceName = QString::fromStdString(ServiceName);
         newPasswordItem.userName = QString::fromStdString(UserName);
         FileContent.push_back(newPasswordItem);
       }else{
@@ -339,13 +382,17 @@ void MainWindow::createFileContentElements(DataFile* File){
     QHBoxLayout* RightLayout = new QHBoxLayout;
 
     QLabel* PasswordType = new QLabel;
-    PasswordType->setText(Item.type);
+    PasswordType->setObjectName("leftSideLabelsInPasswordElement");
+    PasswordType->setText(Item.ServiceName);
+
     QLineEdit* UserName = new QLineEdit;
     UserName->setText(Item.userName);
     UserName->setReadOnly(true);
 
     QLabel* passwordLabel = new QLabel;
+    passwordLabel->setObjectName("leftSideLabelsInPasswordElement");
     passwordLabel->setText("Password");
+
     QLineEdit* Password = new QLineEdit;
     Password->setText(Item.password);
     Password->setReadOnly(true);   
@@ -385,7 +432,7 @@ void MainWindow::createFileContentElements(DataFile* File){
 
     MainLayoutHolder->addWidget(holderwidget);
 
-    editLineVector.push_back({UserName,Password});
+    editLineVector.push_back({PasswordType,UserName,Password});
     lineEditElementsHolders.push_back(holderwidget);
   }
   currentlyLoadedFile = File;
@@ -393,7 +440,7 @@ void MainWindow::createFileContentElements(DataFile* File){
 }
 void MainWindow::DeleteItem(const PasswordItem Item){
   for(size_t i=0;i<currentlyLoadedFile->FileContent.size();i++){
-    if(Item.type == currentlyLoadedFile->FileContent[i].type && Item.userName == currentlyLoadedFile->FileContent[i].userName && Item.password == currentlyLoadedFile->FileContent[i].password){
+    if(Item.ServiceName == currentlyLoadedFile->FileContent[i].ServiceName && Item.userName == currentlyLoadedFile->FileContent[i].userName && Item.password == currentlyLoadedFile->FileContent[i].password){
       currentlyLoadedFile->FileContent.erase(currentlyLoadedFile->FileContent.begin()+i);
     }
   }
@@ -413,27 +460,22 @@ void MainWindow::EditLineChanged(){
   QString text = SearchBar->text();
   for(size_t i=0;i<lineEditElementsHolders.size();i++){
     QWidget* element = lineEditElementsHolders[i];
-    if(currentlyLoadedFile->FileContent[i].type.toLower().contains(text.toLower())) element->show();
+    if(currentlyLoadedFile->FileContent[i].ServiceName.toLower().contains(text.toLower())) element->show();
     else element->hide();
   }
 }
 
 void MainWindow::RandomizePassword(PasswordItem Item){
   for(size_t i=0;i<currentlyLoadedFile->FileContent.size();i++){
-    if(currentlyLoadedFile->FileContent[i].type == Item.type &&
+    if(currentlyLoadedFile->FileContent[i].ServiceName == Item.ServiceName &&
         currentlyLoadedFile->FileContent[i].userName == Item.userName &&
         currentlyLoadedFile->FileContent[i].password == Item.password){
 
-      std::stringstream sstr;
-
-      for(int i=0;i<16;i++){
-        char CharacterCase = rand() % 2 ? 'A':'a';
-        char Character = rand()%2? (char)(rand() % 26 + CharacterCase):(char)(rand() % 10 + '0');
-        sstr << Character;
-      }
-      QString formatedNewPassword = QString::fromStdString(sstr.str());
-      editLineVector[i][1]->setText(formatedNewPassword);
-      if(editLineVector[0][0]->isReadOnly()) EnableEditContent();
+      std::string pass = GeneratePassword(); 
+      QString formatedNewPassword = QString::fromStdString(pass);
+      QLineEdit* PassElement = qobject_cast<QLineEdit*>(editLineVector[i][2]);
+      PassElement->setText(formatedNewPassword);
+      if(PassElement->isReadOnly()) EnableEditContent();
       break;
     }
   }

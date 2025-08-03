@@ -9,20 +9,28 @@ QLineEdit{
   font-size:17px;
 }
 
-QLabel{
+#leftSideLabelsInPasswordElement{
   padding:5px;
   min-width:100px;
   max-width:100px;
   min-height:20px;
 }
+
 #passwordLabel{
   max-width:1000px;
   margin:50px 0px 10px 0px;
 }
 
+#somethingMissingLabel{
+  color:red;
+  font-size:12px;
+}
+
 QLineEdit{
   background-color:#101010;
 }
+
+#addNewPasswordElement,
 #cancelButton,
 #editContent,
 #loadFileBtn{
@@ -35,6 +43,7 @@ QLineEdit{
   border: 1px solid #888888;
 }
 
+#addNewPasswordElement:hover,
 #cancelButton:hover,
 #editContent:hover,
 #loadFileBtn:hover{
@@ -75,14 +84,16 @@ QScrollBar::add-line:horizontal {
     background: none;
 }
 
+#ADDButton,
 #okButton{
-  max-width: 100px;
-  max-height:40px;
-  min-width: 100px;
-  min-height:40px;
-  margin-bottom:100px;
+  max-width: 120px;
+  max-height:50px;
+  min-width: 120px;
+  min-height:50px;
+  margin-bottom:40px;
 }
 
+#RandomizePass,
 #NewRandomPassword,
 #deleteButton{
   max-width:30px;
@@ -90,6 +101,7 @@ QScrollBar::add-line:horizontal {
   max-height:30px;
   min-height:30px;
 }
+
 #SearchBar{
   margin:0px 100px 0px 100px;
   min-height: 35px;

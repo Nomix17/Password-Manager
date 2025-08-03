@@ -7,7 +7,7 @@
 #include <QPushButton>
 
 typedef struct PasswordItem{
-  QString type;
+  QString ServiceName;
   QString userName;
   QString password;
 } PasswordItem;
@@ -27,12 +27,13 @@ class MainWindow: public QMainWindow{
   void EnableEditContent();
   void SaveEditedContent();
   void CancelContentEdit();
+  void NewPasswordElement();
   void loadFile(DataFile* File);
   void savePasswordFile(DataFile* File);
   void loadPasswordFile();
   void createFileButton(DataFile* File);
-  QString GetPasswordInput();
-  int EncryptingViaPython(QString FilePath,QString Password, std::string newContent);
+  QString GetPasswordInput(QString responce="");
+  int EncryptingViaPython(QString FilePath,QString Password, std::string newContent="Just a Drill");
   QString DecryptingViaPython(QString FilePath, QString Password);
   std::vector <PasswordItem> fetchContent(QString FileOutput);
   void createFileContentElements(DataFile* File);
@@ -50,18 +51,20 @@ class MainWindow: public QMainWindow{
   //right side
   QVBoxLayout* MainLayoutHolder;
   QScrollArea* RigthScrollArea;
+  QWidget* widgetholder;
   QLineEdit *SearchBar;
  
   //top 
   QPushButton *editContent;
   QPushButton *loadFileBtn;
+  QPushButton *addNewPasswordElement;
 
   QScrollArea* LeftScrollArea;
   QWidget* LeftWidgetHolder;
   QVBoxLayout* LeftLayoutHolder;
 
   std::vector<DataFile*> loadedFiles; 
-  std::vector<std::vector<QLineEdit*>> editLineVector;
+  std::vector<std::vector<QWidget*>> editLineVector;
   std::vector<QWidget*> lineEditElementsHolders;
   DataFile* currentlyLoadedFile = nullptr;
 };
