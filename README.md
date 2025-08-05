@@ -27,5 +27,5 @@ cd Password-Manager
 chmod +x src/build.sh run.sh
 cd src 
 sudo ./build.sh
-sudo chown -R $(whoami):$(whoami) /opt/VFW
+sudo chown -R $(whoami):$(whoami) /opt/PasswordManager
 ```
