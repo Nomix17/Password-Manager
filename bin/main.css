@@ -9,6 +9,9 @@ QLineEdit{
   font-size:17px; 
 }
 
+QScrollArea{
+  border:none;
+}
 #leftSideLabelsInPasswordElement{
   padding:5px;
   min-width:100px;
