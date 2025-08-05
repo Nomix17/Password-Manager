@@ -14,81 +14,121 @@
 #include <QFileInfo>
 #include <QIcon>
 
+void clearALayout(QLayout* layout);
+
 MainWindow::MainWindow(QWidget *parentWidget):QMainWindow(parentWidget){
+
   MainCentralWidget = new QWidget;
-  MainLayout = new QVBoxLayout(MainCentralWidget);
+  MainLayout = new QHBoxLayout(MainCentralWidget);
 
-  TopLayout = new QHBoxLayout;
-  RightLayout = new QHBoxLayout;
-
-  LeftLayout = new QVBoxLayout;
-  MainContentLayout = new QVBoxLayout;
-
-  LeftScrollArea = new QScrollArea;
-  LeftWidgetHolder = new QWidget;
-  LeftLayoutHolder = new QVBoxLayout;
-
-  SearchBar = new QLineEdit;
-  SearchBar->setObjectName("SearchBar");
-  connect(SearchBar,&QLineEdit::textChanged, this, &MainWindow::EditLineChanged);
-
-  LeftWidgetHolder->setObjectName("LeftWidgetHolder");
-  LeftScrollArea->setWidgetResizable(true);
-  LeftScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-  LeftWidgetHolder->setLayout(LeftLayoutHolder);
-  LeftScrollArea->setWidget(LeftWidgetHolder);
-  LeftLayout->addWidget(LeftScrollArea);
-
-  MainLayout->addLayout(TopLayout);
-  MainLayout->addLayout(RightLayout);
-  MainLayout->setAlignment(Qt::AlignTop);
-
-  RightLayout->addLayout(LeftLayout);
-  RightLayout->addLayout(MainContentLayout);
+  RightLayout = new QVBoxLayout;
+  TopRightLayout = new QHBoxLayout;
  
-  LeftScrollArea->setFixedWidth(200);
+  LeftLayout = new QVBoxLayout;
+  TopLeftLayout = new QHBoxLayout;
 
-  RightLayout->setStretchFactor(MainContentLayout, 1);
-  RightLayout->setAlignment(Qt::AlignLeft);
-  LeftLayoutHolder->setAlignment(Qt::AlignTop);
-
+ 
+  //top left
   loadFileBtn = new QPushButton;
+  CreateNewFile = new QPushButton;
   loadFileBtn->setObjectName("loadFileBtn");
-  
-  addNewPasswordElement = new QPushButton;
-  addNewPasswordElement->setObjectName("addNewPasswordElement");
+  CreateNewFile->setObjectName("CreateNewFile");
 
-  editContent = new QPushButton;
-  editContent->setObjectName("editContent");
-  
+  // bottom left
+  LeftScrollArea = new QScrollArea;
+  LeftScrollAreaWidgetHolder = new QWidget;
+  LeftLayoutHolder = new QVBoxLayout;
+  LeftWidgetHolder = new QWidget;
+  LeftWidgetHolder->setObjectName("LeftWidgetHolder");
+  LeftScrollArea->setObjectName("LeftScrollArea");
+
+  // linking top left widgets
+  TopLeftLayout->addWidget(loadFileBtn);
+  TopLeftLayout->addStretch();
+  TopLeftLayout->addWidget(CreateNewFile);
+  LeftLayout->addLayout(TopLeftLayout);
+
+  // linking bottom left widgets
+  LeftLayout->addWidget(LeftScrollArea);
+  LeftScrollArea->setWidget(LeftScrollAreaWidgetHolder);
+  LeftScrollArea->setLayout(LeftLayoutHolder);
+
+  // linking left layouts
+  LeftWidgetHolder->setLayout(LeftLayout);
+  MainLayout->addWidget(LeftWidgetHolder);
+
+  //styling left elements
   loadFileBtn->setIcon(QPixmap("icons/loadFileIcon.png"));
-  editContent->setIcon(QPixmap("icons/editIcon.png"));
-  addNewPasswordElement->setIcon(QPixmap("icons/add.png"));
+  CreateNewFile->setIcon(QPixmap("icons/createFile.png"));
 
   loadFileBtn->setIconSize(QSize(24,24));
+  CreateNewFile->setIconSize(QSize(24,24));
+
+  LeftWidgetHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  LeftScrollArea->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  loadFileBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+  CreateNewFile->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  LeftLayoutHolder->setAlignment(Qt::AlignTop);
+
+  LeftScrollArea->setMaximumWidth(400);
+  LeftScrollArea->setMinimumWidth(200);
+
+  // connecting left elements to there functions 
+  connect(loadFileBtn, &QPushButton::clicked, this, &MainWindow::getFile);
+  connect(CreateNewFile, &QPushButton::clicked, this, &MainWindow::CreateNewPasswordFile);
+
+
+  //top right
+  addNewPasswordElement = new QPushButton;
+  SearchBar = new QLineEdit;
+  editContent = new QPushButton;
+  addNewPasswordElement->setObjectName("addNewPasswordElement");
+  SearchBar->setObjectName("SearchBar");
+  editContent->setObjectName("editContent");
+
+  // bottom right
+  RigthScrollArea = new QScrollArea;
+  widgetholder = new QWidget;
+  RightEnternelHolderLayout = new QVBoxLayout;
+
+  // linking Top right widgets
+  TopRightLayout->addWidget(addNewPasswordElement);
+  TopRightLayout->addWidget(SearchBar);
+  TopRightLayout->addWidget(editContent);
+  RightLayout->addLayout(TopRightLayout);
+
+  // linking Bottom right widgets
+  RightLayout->addWidget(RigthScrollArea);
+  RigthScrollArea->setWidget(widgetholder);
+  widgetholder->setLayout(RightEnternelHolderLayout);
+
+  // linking right layouts
+  MainLayout->addLayout(RightLayout);
+
+  //styling right layout elements 
+  addNewPasswordElement->setIcon(QPixmap("icons/add.png"));
+  editContent->setIcon(QPixmap("icons/editIcon.png"));
+
   editContent->setIconSize(QSize(24,24));
   addNewPasswordElement->setIconSize(QSize(24,24));
 
-  connect(loadFileBtn,&QPushButton::clicked,this,&MainWindow::getFile);
+  addNewPasswordElement->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  SearchBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  editContent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+  TopRightLayout->setContentsMargins(0,9,0,0);
+  LeftLayoutHolder->setContentsMargins(0,10,0,0);
+
+  // connecting right elements to there functions
+  connect(SearchBar, &QLineEdit::textChanged, this, &MainWindow::EditLineChanged);
   connect(editContent,&QPushButton::clicked,this,&MainWindow::EnableEditContent);
   connect(addNewPasswordElement,&QPushButton::clicked,this,&MainWindow::NewPasswordElement);
 
-  SearchBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  loadFileBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-  editContent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-
-  TopLayout->addWidget(loadFileBtn);
-  TopLayout->addWidget(SearchBar);
-  TopLayout->addWidget(addNewPasswordElement);
-  TopLayout->addWidget(editContent);
 
   loadPasswordFile();
   for(DataFile* File:loadedFiles)
     createFileButton(File);
 
   setCentralWidget(MainCentralWidget);
-
 }
 
 void MainWindow::getFile(){
@@ -103,9 +143,37 @@ void MainWindow::getFile(){
     savePasswordFile(newFileElement);
   }
 }
+void MainWindow::CreateNewPasswordFile(){
+  QString DirectoryPath = QFileDialog::getExistingDirectory(this,tr("Select Directory"),"/home/");
+  if(DirectoryPath.isEmpty()) return;
+  int numberOfFiles = 0;
+  for(auto& file: std::filesystem::directory_iterator(DirectoryPath.toStdString())) numberOfFiles++;
+  
+  QLineEdit* FileNameEdit = new QLineEdit;
+  FileNameEdit->setObjectName("FileNameEdit");
+  FileNameEdit->setText(QString::fromStdString("Unamed "+std::to_string(numberOfFiles)+".gpg"));
+  connect(FileNameEdit,&QLineEdit::returnPressed, [this,FileNameEdit,DirectoryPath](){
+    QString FullPath = DirectoryPath+"/"+FileNameEdit->text();
+    QFileInfo fi(FullPath);
+    DataFile *newFileElement = new DataFile;
+    newFileElement->path = FullPath;
+    newFileElement->fileName = fi.fileName();
+    loadedFiles.push_back(newFileElement);
+    createFileButton(newFileElement);
+    savePasswordFile(newFileElement);
+    FileNameEdit->deleteLater();
+    EnableEditContent();
+    std::ofstream newFile(FullPath.toStdString());
+    newFile.close();
+  });
+
+  LeftLayoutHolder->addWidget(FileNameEdit);
+}
+
 
 void MainWindow::EnableEditContent(){
   if(currentlyLoadedFile == nullptr) return;
+
   for(size_t i=0;i<editLineVector.size();i++){
     QLineEdit* UserNameElement = qobject_cast<QLineEdit*>(editLineVector[i][1]);
     QLineEdit* PassElement = qobject_cast<QLineEdit*>(editLineVector[i][2]);
@@ -117,7 +185,7 @@ void MainWindow::EnableEditContent(){
   cancelButton->setIcon(QPixmap("icons/cancel.png"));
   cancelButton->setIconSize(QSize(24,24));
   cancelButton->setObjectName("cancelButton");
-  TopLayout->addWidget(cancelButton);
+  TopRightLayout->addWidget(cancelButton);
   disconnect(editContent,nullptr,nullptr,nullptr);
   connect(cancelButton,&QPushButton::clicked,this,&MainWindow::CancelContentEdit);
   connect(editContent,&QPushButton::clicked,this,&MainWindow::SaveEditedContent);
@@ -189,7 +257,6 @@ void MainWindow::NewPasswordElement(){
   newPasswordItem.userName = win.UserName;
   newPasswordItem.password = win.Password;
   currentlyLoadedFile->FileContent.push_back(newPasswordItem);
- // 0editLineVector
   createFileContentElements(currentlyLoadedFile);
   EnableEditContent();
 }
@@ -199,6 +266,7 @@ void MainWindow::createFileButton(DataFile* File){
   newFileButton->setText(File->fileName);
   newFileButton->setObjectName("FileButtons");
   connect(newFileButton, &QPushButton::clicked, [this,File](){
+    clearALayout(RightEnternelHolderLayout);
     CancelContentEdit();
     loadFile(File); 
   });
@@ -222,11 +290,12 @@ void MainWindow::loadFile(DataFile* File){
     std::vector <PasswordItem> FileContent = fetchContent(DecryptionResults);
     File->FileContent = FileContent;
     createFileContentElements(File); 
+    CancelContentEdit();
   }
 }
 
 void MainWindow::savePasswordFile(DataFile* File){
-  std::ofstream file("cache/save");
+  std::ofstream file("cache/save", std::ios_base::app);
   if(file){
     file << File->fileName.toStdString() << "," << File->path.toStdString()<<"\n";
     file.close();
@@ -236,10 +305,18 @@ void MainWindow::loadPasswordFile(){
   std::string line;
   std::ifstream file("cache/save");
   while(std::getline(file, line)){
-    DataFile *newFile = new DataFile;
-    newFile->fileName = QString::fromStdString(line.substr(0,line.find(",")));
-    newFile->path = QString::fromStdString(line.substr(line.find(",")+1));
-    loadedFiles.push_back(newFile);
+    if(line.size()){
+      DataFile *newFile = new DataFile;
+      QString NewFilePath = QString::fromStdString(line.substr(line.find(",")+1));
+      //check if the file exist
+      std::ifstream file(NewFilePath.toStdString());
+      if(file){ 
+        QString NewFileName = QString::fromStdString(line.substr(0,line.find(",")));
+        newFile->fileName = NewFileName;
+        newFile->path = NewFilePath;
+        loadedFiles.push_back(newFile);
+      }
+    }
   }
 }
 
@@ -355,23 +432,19 @@ std::vector <PasswordItem> MainWindow::fetchContent(QString FileOutput){
   return FileContent;
 }
 
-void clearALayout(QLayout* layout);
 
 void MainWindow::createFileContentElements(DataFile* File){
-  clearALayout(MainContentLayout);
+  clearALayout(RightEnternelHolderLayout);
   editLineVector.clear();
   lineEditElementsHolders.clear();
-
-  RigthScrollArea = new QScrollArea;
-  QWidget* widgetholder = new QWidget;
-  MainLayoutHolder = new QVBoxLayout;
-  MainLayoutHolder->setAlignment(Qt::AlignTop);
+  RightEnternelHolderLayout->setAlignment(Qt::AlignTop);
 
   RigthScrollArea->setWidget(widgetholder);
   RigthScrollArea->setWidgetResizable(true);
   RigthScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  widgetholder->setLayout(MainLayoutHolder);
-  MainContentLayout->addWidget(RigthScrollArea);
+  
+  widgetholder->setLayout(RightEnternelHolderLayout);
+  RightLayout->addWidget(RigthScrollArea);
   widgetholder->setObjectName("CentralWidgetHolder");
 
   for(PasswordItem Item:File->FileContent){
@@ -381,7 +454,7 @@ void MainWindow::createFileContentElements(DataFile* File){
     QVBoxLayout* FarRightLayout = new QVBoxLayout;
 
     QHBoxLayout* TopLayout = new QHBoxLayout;
-    QHBoxLayout* RightLayout = new QHBoxLayout;
+    QHBoxLayout* BottomLayout = new QHBoxLayout;
 
     QLabel* serviceNameLabel = new QLabel;
     serviceNameLabel->setText(Item.ServiceName);
@@ -395,7 +468,23 @@ void MainWindow::createFileContentElements(DataFile* File){
     passwordLabel->setText("Password");
     QLineEdit* Password = new QLineEdit;
     Password->setText(Item.password);
-    Password->setReadOnly(true);   
+    Password->setReadOnly(true);
+    Password->setEchoMode(QLineEdit::Password);
+
+    QPushButton* togglePasswordVisibility = new QPushButton;
+    togglePasswordVisibility->setObjectName("togglePasswordVisibility");
+    togglePasswordVisibility->setIcon(QPixmap("icons/display.png"));
+    togglePasswordVisibility->setIconSize(QSize(20,20));
+    connect(togglePasswordVisibility, &QPushButton::clicked, [this, Password,togglePasswordVisibility](){
+      if(Password->echoMode() == QLineEdit::Password){
+        Password->setEchoMode(QLineEdit::Normal);
+        togglePasswordVisibility->setIcon(QPixmap("icons/hide.png"));
+      }
+      else{
+        Password->setEchoMode(QLineEdit::Password);
+        togglePasswordVisibility->setIcon(QPixmap("icons/display.png"));
+      }
+    });
 
     QPushButton* deleteButton = new QPushButton;
     deleteButton->setObjectName("deleteButton");
@@ -416,11 +505,12 @@ void MainWindow::createFileContentElements(DataFile* File){
     TopLayout->addWidget(serviceNameLabel);
     TopLayout->addWidget(UserName);
     
-    RightLayout->addWidget(passwordLabel);
-    RightLayout->addWidget(Password);
+    BottomLayout->addWidget(passwordLabel);
+    BottomLayout->addWidget(Password);
+    BottomLayout->addWidget(togglePasswordVisibility);
 
     ElementLayout->addLayout(TopLayout);
-    ElementLayout->addLayout(RightLayout);
+    ElementLayout->addLayout(BottomLayout);
 
     FarRightLayout->addWidget(deleteButton);
     FarRightLayout->addWidget(NewRandomPassword);
@@ -430,14 +520,14 @@ void MainWindow::createFileContentElements(DataFile* File){
 
     holderwidget->setLayout(layoutholder);
 
-    MainLayoutHolder->addWidget(holderwidget);
+    RightEnternelHolderLayout->addWidget(holderwidget);
 
     editLineVector.push_back({serviceNameLabel,UserName,Password});
     lineEditElementsHolders.push_back(holderwidget);
   }
   currentlyLoadedFile = File;
-
 }
+
 void MainWindow::DeleteItem(const PasswordItem Item){
   for(size_t i=0;i<currentlyLoadedFile->FileContent.size();i++){
     if(Item.ServiceName == currentlyLoadedFile->FileContent[i].ServiceName && Item.userName == currentlyLoadedFile->FileContent[i].userName && Item.password == currentlyLoadedFile->FileContent[i].password){

@@ -22,7 +22,7 @@ QLineEdit{
 }
 
 #somethingMissingLabel{
-  color:#101010;
+  color:red;
   font-size:12px;
 }
 
@@ -30,10 +30,11 @@ QLineEdit{
   background-color:#101010;
 }
 
+#loadFileBtn,
+#CreateNewFile,
 #addNewPasswordElement,
-#cancelButton,
 #editContent,
-#loadFileBtn{
+#cancelButton{
   min-width: 39px;
   min-height: 39px;
   max-width: 39px;
@@ -43,6 +44,7 @@ QLineEdit{
   border: 1px solid #888888;
 }
 
+#CreateNewFile:hover,
 #addNewPasswordElement:hover,
 #cancelButton:hover,
 #editContent:hover,
@@ -50,11 +52,16 @@ QLineEdit{
   background-color:#282828;
 }
 
+#FileNameEdit,
 #FileButtons{
   font-size:14px;
   margin:5px 10px 5px 10px;
   min-width: 80px;
   min-height: 40px;
+}
+
+#FileNameEdit{
+  background-color:#101010;
 }
 
 #LeftWidgetHolder{
@@ -93,6 +100,7 @@ QScrollBar::add-line:horizontal {
   margin-bottom:40px;
 }
 
+#togglePasswordVisibility,
 #RandomizePass,
 #NewRandomPassword,
 #deleteButton{
@@ -103,12 +111,20 @@ QScrollBar::add-line:horizontal {
 }
 
 #SearchBar{
-  margin:0px 100px 0px 100px;
+  margin:0px 0px 0px 0px;
   min-height: 35px;
   max-height: 35px;
+  min-width: 200px;
   border: 1px solid #888888;
   border-radius: 10px;
   padding-left:10px;
   padding-right:10px;
 }
 
+#LeftWidgetHolder,
+#LeftScrollArea{
+  border:none;
+  background-color:#101010;
+  padding:0;
+  margin:0;
+}

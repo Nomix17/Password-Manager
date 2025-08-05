@@ -8,6 +8,9 @@ gpg = gnupg.GPG()
 
 def PasswordIsCorrect(filePath,Password):
     with open(filePath,"rb") as file:
+        if(len(file.read()) == 0): 
+            return True
+        file.seek(0)
         decryptionResults = gpg.decrypt_file(file,passphrase=Password)
     if (decryptionResults.ok):
         return True

@@ -5,15 +5,19 @@ import os
 
 gpg = gnupg.GPG()
 def DecryptAndSave(filePath,password):
+    results = "";
     with open(filePath, "rb") as file:
-      decrypted_data = gpg.decrypt_file(file,passphrase=password)
-      if(not decrypted_data.ok):
-        results = "Decryption Failed"
-      else:
-        try:
-          results = base64.b64decode(decrypted_data.data).decode("utf-8")
-        except:
-          results = "Base64 Decode Failed"
+      fileContent = file.read()
+      file.seek(0)
+      if(len(fileContent) > 0):
+        decrypted_data = gpg.decrypt_file(file,passphrase=password)
+        if(not decrypted_data.ok):
+          results = "Decryption Failed"
+        else:
+          try:
+            results = base64.b64decode(decrypted_data.data).decode("utf-8")
+          except:
+            results = "Base64 Decode Failed"
       with open("/tmp/resultsFile" ,"w") as file:
         file.write(results)
 

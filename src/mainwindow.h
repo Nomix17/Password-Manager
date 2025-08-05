@@ -24,6 +24,7 @@ class MainWindow: public QMainWindow{
   public:
   MainWindow(QWidget* parentWidget = nullptr);
   void getFile();
+  void CreateNewPasswordFile();
   void EnableEditContent();
   void SaveEditedContent();
   void CancelContentEdit();
@@ -42,27 +43,35 @@ class MainWindow: public QMainWindow{
   void RandomizePassword(PasswordItem Item);
 
   private:
-  QWidget * MainCentralWidget; 
-  QVBoxLayout *MainLayout; 
-  QHBoxLayout *TopLayout; 
-  QHBoxLayout *RightLayout;
-  QVBoxLayout *LeftLayout; 
-  QVBoxLayout *MainContentLayout;
+  QWidget * MainCentralWidget; // main central widget
+  QHBoxLayout *MainLayout; // main layout (it's horizontal)
+
+  QVBoxLayout *RightLayout; // this layout is gonna contain the scrollbar of the password elements
+  QHBoxLayout *TopRightLayout; // top layout it's gonna be added to the right part of teh mainlayout
+ 
+  QVBoxLayout *LeftLayout;  // this layout is gonna contain the scrollbar of the Files elements 
+  QHBoxLayout *TopLeftLayout; // top left layout
 
   //right side
-  QVBoxLayout* MainLayoutHolder;
   QScrollArea* RigthScrollArea;
   QWidget* widgetholder;
- 
-  //top 
-  QPushButton *editContent;
-  QPushButton *loadFileBtn;
+  QVBoxLayout* RightEnternelHolderLayout;
+
+  //top right
   QPushButton *addNewPasswordElement;
   QLineEdit *SearchBar;
+  QPushButton *editContent;
+  QWidget* rightWidgetHolder;
 
+  //left
   QScrollArea* LeftScrollArea;
-  QWidget* LeftWidgetHolder;
+  QWidget* LeftScrollAreaWidgetHolder;
   QVBoxLayout* LeftLayoutHolder;
+  QWidget* LeftWidgetHolder;//so I can change the color of the whole layout
+   
+  //top left
+  QPushButton *loadFileBtn;
+  QPushButton *CreateNewFile;
 
   std::vector<DataFile*> loadedFiles; 
   std::vector<std::vector<QWidget*>> editLineVector;

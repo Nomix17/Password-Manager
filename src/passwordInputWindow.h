@@ -25,6 +25,7 @@ class InputWindow:public QDialog{
       Password = PasswordInput->text();
       if(!Password.isEmpty()) QDialog::accept();
     });
+    PasswordInput->setEchoMode(QLineEdit::Password);
     MainLayout->addWidget(passwordLabel);
     MainLayout->addWidget(PasswordInput);
     MainLayout->addWidget(WrongPassLabel);

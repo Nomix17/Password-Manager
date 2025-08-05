@@ -47,6 +47,7 @@ class NewElementWindow: public QDialog{
     ADDButton->setIconSize(QSize(20,20));
     ADDLayout->addWidget(ADDButton);
     ADDLayout->setAlignment(Qt::AlignHCenter);
+    PasswordEdit->setEchoMode(QLineEdit::Password);
 
     MainLayout->addWidget(ServiceNameLabel);
     MainLayout->addWidget(ServiceNameEdit);
